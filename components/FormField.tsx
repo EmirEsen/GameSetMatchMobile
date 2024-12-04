@@ -18,14 +18,15 @@ const FormField = ({
   keyboardType?: "email-address" | "default" | "numeric" | "phone-pad";
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
       <Text className="text-base font-pmedium">{title}</Text>
 
-      <View className="w-full h-16 px-4 bg-gray-100 rounded-2xl border-2 
-      border-[#212AFBFF] 
-      focus:border-[#96222291] flex flex-row items-center">
+      <View className={`w-full h-16 px-4 bg-gray-100 rounded-2xl border-2 
+        ${isFocused ? 'border-[#212AFBFF]' : 'border-[#0006b581]'}
+        flex flex-row items-center`}>
         <TextInput
           className="flex-1 font-psemibold text-base"
           value={value}
@@ -33,6 +34,8 @@ const FormField = ({
           placeholderTextColor="#7B7B8B"
           onChangeText={handleChangeText}
           secureTextEntry={title === "Password" && !showPassword}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           {...props}
         />
 
