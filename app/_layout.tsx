@@ -6,6 +6,11 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Provider } from 'react-redux';
+import store from '@/store';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '@/components/ui/toastConfig';
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,14 +43,17 @@ export default function RootLayout() {
   }
   
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>        
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <GestureHandlerRootView style={{ flex: 1 }}>        
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>        
+        <StatusBar style="auto" />
+        <Toast config={toastConfig} />
+      </GestureHandlerRootView>
+    </Provider>
   );
 }
