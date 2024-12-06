@@ -1,5 +1,5 @@
 import icons from "@/constants/icons";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 
 const FormField = ({
@@ -19,15 +19,22 @@ const FormField = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
-      <Text className="text-base font-pmedium">{title}</Text>
+      <Text 
+        className="text-base font-pmedium" 
+        onPress={() => inputRef.current?.focus()}
+      >
+        {title}
+      </Text>
 
       <View className={`w-full h-16 px-4 bg-gray-100 rounded-2xl border-2 
         ${isFocused ? 'border-[#212AFBFF]' : 'border-[#0006b581]'}
         flex flex-row items-center`}>
         <TextInput
+          ref={inputRef}
           className="flex-1 font-psemibold text-base"
           value={value}
           placeholder={placeholder}
