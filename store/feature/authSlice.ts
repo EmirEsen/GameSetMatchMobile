@@ -2,7 +2,9 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { IRegister } from "../../models/auth/IRegister";
 import { IResponse } from "../../models/IResponse";
 import { ILogin } from "../../models/auth/ILogin";
+import * as SecureStore from 'expo-secure-store';
 import config from "./config";
+import { router } from "expo-router";
 
 export interface IAuthState {
     data: string
@@ -136,8 +138,9 @@ const authSlice = createSlice({
         logout(state) {
             state.isAuth = false;
             state.token = ''
-            localStorage.removeItem('token')
+            SecureStore.deleteItemAsync('token')            
             state.data = '';
+            router.replace('/(auth)/sign-in')
         }
     },
     extraReducers: (builder) => {
@@ -148,6 +151,7 @@ const authSlice = createSlice({
             .addCase(fetchRegister.fulfilled, (state, action: PayloadAction<IResponse>) => {
                 state.isLoading = false;
                 state.data = action.payload.data;
+                setToken(state.data)
             })
             .addCase(fetchRegister.rejected, (state) => {
                 state.isLoading = false;
@@ -160,8 +164,8 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 if (action.payload.data) {
                     state.isAuth = true;
-                    state.token = action.payload.data;
-                    localStorage.setItem('token', action.payload.data)
+                    state.token = action.payload.data;                    
+                    SecureStore.setItemAsync('token',action.payload.data);                                
                 }
             })
             .addCase(fetchSendConfirmationEmail.pending, (state) => {

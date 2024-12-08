@@ -1,8 +1,8 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import store from '@/store';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/components/ui/toastConfig';
-
+import * as SecureStore from 'expo-secure-store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,32 +27,69 @@ export default function RootLayout() {
     "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
   });
 
-  useEffect(() => {
-    if (error) throw error;
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+  const [token, setToken] = useState<string | null>(null);
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  const fetchToken = async () => {
+    try {
+      const savedToken = await SecureStore.getItemAsync('token');
+      setToken(savedToken);
+    } catch (err) {
+      console.error('Error fetching token:', err);
     }
-  }, [fontsLoaded, error]);
+  };
 
-  if (!fontsLoaded) {
-    return null;
+  useEffect(() => {
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync().catch(err =>
+        console.error('Error hiding splash screen:', err)
+      );
+      setIsAppReady(true);
+    }
+  }, [fontsLoaded]);
+
+  useEffect(() => {
+    if (isAppReady && token !== null) {
+      router.replace('/');
+    } else if (isAppReady && token === null) {
+      router.replace('/');
+    }
+  }, [isAppReady, token]);
+
+  if (!isAppReady) {
+    return null; // Prevent rendering until the app is ready
   }
 
-  if (!fontsLoaded && !error) {
-    return null;
-  }
-  
   return (
     <Provider store={store}>
-      <GestureHandlerRootView style={{ flex: 1 }}>        
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>        
-        <StatusBar style="auto" />
+          <Stack.Screen
+            name="index"
+            options={{ headerShown: false }}
+          />
+          {/* These are your screens defined as per expo-router */}
+          <Stack.Screen
+            name="(auth)"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="(tabs)"
+            options={{ headerShown: false }}
+          />
+          {/* Fallback Screen */}
+          <Stack.Screen
+            name="+not-found"
+            options={{ headerShown: false, title: 'Not Found' }}
+          />
+        </Stack>
+
         <Toast config={toastConfig} />
+        <StatusBar style="auto" />
       </GestureHandlerRootView>
     </Provider>
   );

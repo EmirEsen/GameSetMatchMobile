@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { IPlayerProfile } from "../../models/IPlayerProfile"
 import { IUpdatePlayerProfile } from "../../models/IUpdatePlayerProfile"
+import * as SecureStore from 'expo-secure-store';
 import config from "./config"
 
 export interface IPlayerState {
@@ -33,7 +34,7 @@ export const fetchPlayerProfile = createAsyncThunk<IPlayerProfile, void, { rejec
         const response = await fetch(`${config.BASE_URL}/api/v1/player/profile`, {
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
+                "Authorization": `Bearer ${await SecureStore.getItemAsync('token')}`
             }
         });
         if (!response.ok) {
@@ -50,7 +51,7 @@ export const fetchUpdatePlayerProfile = createAsyncThunk<IPlayerProfile, IUpdate
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
+                "Authorization": `Bearer ${await SecureStore.getItemAsync('token')}`
             },
             body: JSON.stringify(payload)
         });
@@ -67,7 +68,7 @@ export const uploadPlayerProfileImage = createAsyncThunk<string, FormData, { rej
         const response = await fetch(`${config.BASE_URL}/api/v1/player/profile-image`, {
             method: 'POST',
             headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`
+                "Authorization": `Bearer ${await SecureStore.getItemAsync('token')}`
             },
             body: formData
         });
@@ -86,8 +87,7 @@ const playerSlice = createSlice({
         build
             .addCase(getPlayerProfileList.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.playerList = action.payload;
-                console.log(state.playerList)
+                state.playerList = action.payload;                
             })
             .addCase(fetchPlayerProfile.pending, (state) => {
                 state.isLoading = true;
@@ -95,18 +95,20 @@ const playerSlice = createSlice({
             })
             .addCase(fetchPlayerProfile.fulfilled, (state, action) => {
                 state.isLoading = false;
+                console.log('player slice : -------------->', action.payload)
                 state.loggedInProfile = action.payload;
             })
             .addCase(fetchPlayerProfile.rejected, (state) => {
                 state.isLoading = false;
                 state.error = 'Failed to fetch player profile';
+                console.log('couldnt fetch player profile')
             })
             .addCase(fetchUpdatePlayerProfile.fulfilled, (state) => {
                 state.isLoading = false;
             })
             .addCase(fetchUpdatePlayerProfile.rejected, (state) => {
                 state.isLoading = false;
-                localStorage.removeItem('token');
+                SecureStore.deleteItemAsync('token');
             })
     }
 })

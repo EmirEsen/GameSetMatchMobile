@@ -38,11 +38,11 @@ const SignUp = () => {
       console.log(result);
       if (result && result.code === 200) {        
         Toast.show({
-          text1: "User signed in successfully",
+          text1: "Sign-in and verify your Email.",
           type: "success"
         });
-        router.replace("/");
-      } else if (result && result.code === 1002) {
+        router.replace("/(auth)/sign-in");
+      } else if (result) {
         Toast.show({
           text1: result.message,
           type: "error"
@@ -72,14 +72,17 @@ const SignUp = () => {
             paddingTop: 20
           }}
         >          
-          <View className="flex-row items-center mt-2 justify-center self-center"
-            style={{ borderBottomWidth: 2, borderBottomColor: '#212AFBFF' }}>
-              <Text className="text-primary text-2xl font-bold">GAME</Text>
-              <Text style={{ fontSize: 12 }} className="mx-1">🎾</Text>
-              <Text className="text-primary text-2xl font-bold">SET</Text>
-              <Text style={{ fontSize: 12 }} className="mx-1">🎾</Text>
-              <Text className="text-primary text-2xl font-bold">MATCH</Text>          
-          </View>         
+              <Text className="text-2l text-primary font-bold text-center">
+              Create Your Account on 
+            </Text>              
+            <View className="flex-row items-center mt-2 justify-center self-center"
+              style={{ borderBottomWidth: 2, borderBottomColor: '#212AFBFF' }}>
+                <Text className="text-primary text-2xl font-bold">GAME</Text>
+                <Text style={{ fontSize: 12 }} className="mx-1">🎾</Text>
+                <Text className="text-primary text-2xl font-bold">SET</Text>
+                <Text style={{ fontSize: 12 }} className="mx-1">🎾</Text>
+                <Text className="text-primary text-2xl font-bold">MATCH</Text>          
+            </View>          
 
           <View className="flex-row justify-between mt-7">
             <FormField

@@ -6,6 +6,7 @@ import { ITournament } from "../../models/ITournament"
 import { IGetMatch } from "../../models/get/IGetMatch"
 import { IGetTournamentPlayer } from "../../models/get/IGetTournamentPlayer"
 import { getTournamentMatchList } from './matchSlice';
+import * as SecureStore from 'expo-secure-store';
 
 export interface ITournamentState {
     tournamentList: ITournament[],
@@ -45,7 +46,7 @@ export const addNewTournament = createAsyncThunk<IResponse, IPostTournament, { r
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -74,7 +75,7 @@ export const getMyTournaments = createAsyncThunk<ITournament[], void, { rejectVa
             const response = await fetch(`${config.BASE_URL}/api/v1/tournament/my-tournaments`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`
                 }
             });
 
@@ -118,29 +119,29 @@ const tournamentSlice = createSlice({
             .addCase(getComunityTournamentList.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.tournamentList = action.payload;
-                console.log(action.payload)
+                // console.log(action.payload)
             })
             .addCase(addNewTournament.pending, (state) => {
                 state.isLoading = true;
             })
             .addCase(addNewTournament.fulfilled, (state, action) => {
                 if (action.payload.code === 200) {
-                    console.log('tournament slice data: ', action.payload.data)
-                    console.log('tournament slice: ', action.payload.message)
+                    // console.log('tournament slice data: ', action.payload.data)
+                    // console.log('tournament slice: ', action.payload.message)
                     state.tournamentList.push(action.payload.data)
                 }
                 state.isLoading = false;
             })
             .addCase(addNewTournament.rejected, (state, action) => {
                 state.isLoading = false;
-                console.error(action.payload);
+                // console.error(action.payload);
             })
             .addCase(getMyTournaments.pending, (state) => {
                 state.isLoading = true;
             })
             .addCase(getMyTournaments.fulfilled, (state, action) => {
                 state.isLoading = false;
-                console.log(action.payload)
+                console.log('TOURNAMENT SLICE -----> ;', action.payload)
                 state.myTournaments = action.payload;
             })
             .addCase(getMyTournaments.rejected, (state) => {

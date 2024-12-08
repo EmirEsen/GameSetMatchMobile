@@ -1,12 +1,14 @@
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 
 const CustomButton = ({
+  children,
   title,
   handlePress,
   containerStyles,
   textStyles,
   isLoading,
 }: {
+  children?: React.ReactNode;
   title: string;
   handlePress: () => void;
   containerStyles?: string;
@@ -22,9 +24,11 @@ const CustomButton = ({
       }`}
       disabled={isLoading}
     >
-      <Text className={`text-white font-psemibold text-lg ${textStyles}`}>
-        {title}
-      </Text>
+     {children || ( // Render children if provided, otherwise the title
+        <Text className={`text-white font-psemibold text-lg ${textStyles}`}>
+          {title}
+        </Text>
+      )}
 
       {isLoading && (
         <ActivityIndicator

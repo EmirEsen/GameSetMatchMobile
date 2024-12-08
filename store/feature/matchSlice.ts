@@ -4,6 +4,7 @@ import { IPostMatch } from "../../models/post/IPostMatch"
 import { IResponse } from "../../models/IResponse"
 import config from "./config"
 import { IPageDto } from "../../models/IPageDto"
+import * as SecureStore from 'expo-secure-store';
 
 export interface IMatchState {
     matchList: IGetMatch[],
@@ -68,7 +69,7 @@ export const fetchMatchByTournamentIdAndMatchId = createAsyncThunk<IGetMatch, { 
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
                 }
             });
             if (!response.ok) throw new Error("Network response was not ok");
@@ -90,7 +91,7 @@ export const addNewMatch = createAsyncThunk<IResponse, IPostMatch, { rejectValue
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -111,7 +112,7 @@ export const approveMatch = createAsyncThunk<IResponse, { tournamentId: string, 
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
                 }
             });
 
@@ -137,7 +138,7 @@ export const rejectMatch = createAsyncThunk<IResponse, { tournamentId: string, m
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
                 }
             });
 
@@ -192,7 +193,7 @@ const matchSlice = createSlice({
             .addCase(getMatchList.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.matchList = action.payload;
-                console.log(action.payload)
+                // console.log(action.payload)
             })
             .addCase(getTournamentMatchList.pending, (state) => {
                 state.isLoading = true;

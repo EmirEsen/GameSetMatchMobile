@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import config from "./config";
 import { IMatchNotification } from "../../models/IMatchNotification";
+import * as SecureStore from 'expo-secure-store';
 
 export interface INotificationState {
     notificationList: IMatchNotification[];
@@ -42,7 +43,7 @@ export const fetchNotification = createAsyncThunk<IMatchNotification, string, { 
             const response = await fetch(`${config.BASE_URL}/api/v1/match-notification/notification/${id}`, {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                    "Authorization": `Bearer ${SecureStore.getItemAsync('token')}`
                 }
             });
             if (!response.ok) {
@@ -64,7 +65,7 @@ export const markNotificationAsRead = createAsyncThunk<void, string, { rejectVal
                 method: 'PUT',
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`
+                    "Authorization": `Bearer ${SecureStore.getItemAsync('token')}`
                 }
             });
             if (!response.ok) {

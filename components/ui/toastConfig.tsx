@@ -24,7 +24,7 @@ export const toastConfig: ToastConfig = {
     <ErrorToast
       {...props}
       style={{
-        borderTopWidth: 8,
+        borderTopWidth: 5,
         borderTopColor: 'red',
         borderRadius: 16,
         // padding: 5,
