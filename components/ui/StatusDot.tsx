@@ -9,14 +9,14 @@ const StatusDot: React.FC<StatusDotProps> = ({ status }) => {
     // Function to determine the color of the dot based on the tournament status
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "ONGOING":
-                return "bg-green-500";
-            case "COMPLETED":
-                return "bg-red-500";
-            case "UPCOMING":
-                return "bg-yellow-500";
+            case 'ONGOING':
+                return '#22C55E'; // Tailwind's bg-green-500
+            case 'COMPLETED':
+                return '#EF4444'; // Tailwind's bg-red-500
+            case 'UPCOMING':
+                return '#FACC15'; // Tailwind's bg-yellow-500
             default:
-                return "bg-gray-400"; // Default color if status is unknown
+                return '#9CA3AF'; // Tailwind's bg-gray-400
         }
     };
 
@@ -27,7 +27,14 @@ const StatusDot: React.FC<StatusDotProps> = ({ status }) => {
                 {status}
             </Text>
             {/* Status Dot */}
-            <View className={`w-2.5 h-2.5 rounded-full ml-2 ${getStatusColor(status)}`} />
+            <View
+                style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: getStatusColor(status),
+                    marginLeft: 8,
+                }} />
         </View>
     );
 };

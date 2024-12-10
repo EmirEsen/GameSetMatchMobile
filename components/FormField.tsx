@@ -23,8 +23,8 @@ const FormField = ({
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
-      <Text 
-        className="text-base font-pmedium" 
+      <Text
+        className="text-base font-pmedium"
         onPress={() => inputRef.current?.focus()}
       >
         {title}
