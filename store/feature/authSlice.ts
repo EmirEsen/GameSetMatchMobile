@@ -138,9 +138,9 @@ const authSlice = createSlice({
         logout(state) {
             state.isAuth = false;
             state.token = ''
-            SecureStore.deleteItemAsync('token')            
+            SecureStore.deleteItemAsync('token')
             state.data = '';
-            router.replace('/(auth)/sign-in')
+            router.replace('/')
         }
     },
     extraReducers: (builder) => {
@@ -164,8 +164,8 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 if (action.payload.data) {
                     state.isAuth = true;
-                    state.token = action.payload.data;                    
-                    SecureStore.setItemAsync('token',action.payload.data);                                
+                    state.token = action.payload.data;
+                    SecureStore.setItemAsync('token', action.payload.data);
                 }
             })
             .addCase(fetchSendConfirmationEmail.pending, (state) => {

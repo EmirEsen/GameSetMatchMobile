@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { router, Stack } from 'expo-router';
+import { router, Stack, Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -11,6 +11,7 @@ import store from '@/store';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/components/ui/toastConfig';
 import * as SecureStore from 'expo-secure-store';
+import { Image } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -54,7 +55,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (isAppReady && token !== null) {
-      router.replace('/');
+      router.replace('/my-tournaments');
     } else if (isAppReady && token === null) {
       router.replace('/');
     }
@@ -80,6 +81,18 @@ export default function RootLayout() {
           <Stack.Screen
             name="(tabs)"
             options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="[tournamentId]"
+            options={{
+              headerTitle: "Tournament",
+              headerLeft: () => (
+                <Image
+                  source={require('../assets/images/sampleimage.jpg')}
+                  style={{ width: 36, height: 36, resizeMode: 'cover', borderRadius: 100 }}
+                />
+              )
+            }}
           />
           {/* Fallback Screen */}
           <Stack.Screen

@@ -39,7 +39,11 @@ const Tournament: React.FC<TournamentProps> = ({ tournament, tournamentPlayers }
     const formattedDates = formatTournamentDate(tournament.start, tournament.end, tournament.isDurationFinite);
 
     const handleTournamentPress = (tournamentId: string) => {
-        router.push(`/tournaments`);
+        console.log(`Navigating to: /${tournamentId}/ranklist`);
+        router.push({
+            pathname: "/[tournamentId]/ranklist",
+            params: { tournamentId }
+        });
     };
 
     return (
