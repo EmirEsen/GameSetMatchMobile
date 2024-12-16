@@ -1,6 +1,6 @@
 import { IGetMatch } from "@/models/get/IGetMatch";
 import { IGetTournamentPlayer } from "@/models/get/IGetTournamentPlayer";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -30,12 +30,16 @@ const formatTimeRemaining = (endTime: Date) => {
 const formatMatchDate = (date: string): string => dayjs(date).format('DD MMM YYYY');
 
 const getRatingChangeDisplay = (ratingChange: number) => {
-    const color = ratingChange > 0 ? 'green' : ratingChange < 0 ? 'red' : 'gray';
-    const icon = ratingChange > 0 ? 'arrow-drop-up' : ratingChange < 0 ? 'arrow-drop-down' : 'arrow-right';
+    const iconSize = 12;
+    const icon = ratingChange > 0 ?
+        <AntDesign name="caretup" size={iconSize} color="green" />
+        : ratingChange < 0 ? <AntDesign name="caretdown" size={iconSize} color="red" /> : <AntDesign name="caretright" size={iconSize} color="gray" />
     return (
         <View style={styles.ratingChange}>
-            <MaterialIcons name={icon} size={18} color={color} />
-            <Text style={[styles.ratingText, { color }]}>{Math.abs(ratingChange)}</Text>
+            {icon}
+            <Text style={[styles.ratingText, { color: ratingChange > 0 ? 'green' : ratingChange < 0 ? 'red' : 'gray' }]}>
+                {Math.abs(ratingChange)}
+            </Text>
         </View>
     );
 };
@@ -77,17 +81,26 @@ export default function MatchInfo({
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.court}>{court}</Text>
-                <Text style={styles.dateTime}>
-                    {date ? formatMatchDate(date) : 'No date'} | {time ? excludeSeconds(time) : '-'}
+                <Text style={styles.court}>
+                    {court}
                 </Text>
+                <View style={styles.dateTimeContainer}>
+                    <Text style={styles.dateTime}>
+                        {date ? formatMatchDate(date) : 'No date'}
+                    </Text>
+                    <Text style={styles.time}>
+                        {time ? excludeSeconds(time) : '-'}
+                    </Text>
+                </View>
             </View>
+
+            <View style={styles.divider} />
 
             <View style={styles.playerRow}>
                 {status === MatchStatus.APPROVED && getRatingChangeDisplay(match.player1RatingChange)}
                 <Text style={styles.playerName}>
                     {`${player1.firstname[0]}. ${player1.lastname}`}
-                    {!isDraw && winner === player1 && ' ✔'}
+                    {!isDraw && winner === player1 && <Entypo name="check" size={18} color="green" />}
                 </Text>
                 <Text style={styles.score}>{score.map((set) => set.player1Score).join(' ') || 'N/A'}</Text>
             </View>
@@ -96,7 +109,7 @@ export default function MatchInfo({
                 {status === MatchStatus.APPROVED && getRatingChangeDisplay(match.player2RatingChange)}
                 <Text style={styles.playerName}>
                     {`${player2.firstname[0]}. ${player2.lastname}`}
-                    {!isDraw && winner === player2 && ' ✔'}
+                    {!isDraw && winner === player2 && <Entypo name="check" size={18} color="green" />}
                 </Text>
                 <Text style={styles.score}>{score.map((set) => set.player2Score).join(' ') || 'N/A'}</Text>
             </View>
@@ -107,6 +120,8 @@ export default function MatchInfo({
                     <MaterialIcons name="access-time" size={14} color="#ffa726" /> {timeRemaining}
                 </Text>
             )}
+
+            <View style={styles.divider} />
 
             <Text style={styles.result}>
                 {isDraw
@@ -122,21 +137,31 @@ export default function MatchInfo({
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
-        borderRadius: 8,
+        borderRadius: 16,
         marginVertical: 8,
         padding: 16,
         elevation: 2,
+        minWidth: '90%',
     },
     header: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 8,
     },
     court: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
+        flex: 1,
+    },
+    dateTimeContainer: {
+        alignItems: 'flex-end',
     },
     dateTime: {
+        fontSize: 12,
+        color: 'gray',
+    },
+    time: {
         fontSize: 12,
         color: 'gray',
     },
@@ -149,6 +174,7 @@ const styles = StyleSheet.create({
     playerName: {
         fontSize: 14,
         fontWeight: 'bold',
+        color: 'blue',
         flex: 1,
     },
     score: {
@@ -162,6 +188,7 @@ const styles = StyleSheet.create({
     },
     ratingText: {
         fontSize: 12,
+        marginLeft: 4,
         fontWeight: 'bold',
     },
     pendingText: {
@@ -183,5 +210,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'red',
         fontSize: 14,
+    },
+    divider: {
+        height: 0.5,
+        width: 'auto',
+        marginHorizontal: 4,
+        backgroundColor: 'lightgray',
     },
 });
