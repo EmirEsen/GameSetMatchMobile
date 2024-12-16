@@ -46,6 +46,7 @@ const tournamentSlice = createSlice({
             })
             .addCase(getPlayersOfTournament.fulfilled, (state, action) => {
                 state.tournamentPlayerList = action.payload; // Set the fetched players
+                console.log('action.payload', action.payload);
                 state.isLoading = false; // Set loading to false
             })
             .addCase(getPlayersOfTournament.rejected, (state, action) => {

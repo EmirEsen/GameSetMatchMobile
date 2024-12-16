@@ -5,44 +5,62 @@ import { Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import home from './home';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import TournamentList from './(tournaments)/tournamentList';
+import HomeTopTabs from './(home)/_layout';
+import BlurTabBarBackground from '@/components/ui/TabBarBackground.ios';
+import ProfileTopTabs from './(profile)/_layout';
+import TournamentLayout from './(tournaments)/[id]/_layout';
+import TournamentTopTabs from './(tournaments)/[id]';
 
-export default function TabLayout() {
+// const Tab = createBottomTabNavigator();
 
+export default function TabsLayout() {
     return (
         <Tabs
             screenOptions={{
                 headerShown: false,
+                headerStyle: {
+                    backgroundColor: TabBarBackground,
+                },
                 tabBarButton: HapticTab,
-                tabBarBackground: TabBarBackground,
+                tabBarBackground: BlurTabBarBackground,
                 tabBarStyle: Platform.select({
                     ios: {
-                        // Use a transparent background on iOS to show the blur effect
-                        position: 'absolute',
-                        borderTopWidth: 0
+                        borderTopWidth: 0,
+                        backgroundColor: TabBarBackground,
                     },
-                    default: {},
+                    default: {
+                        backgroundColor: '#081223',
+                    },
                 }),
             }}>
             <Tabs.Screen
-                name="home"
+                name="(home)"
                 options={{
                     title: 'Home',
-                    tabBarIcon: ({ focused, color }) => <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />,
+                    headerShown: true,
+                    tabBarIcon: ({ focused, color }) =>
+                        <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />,
                 }}
             />
             <Tabs.Screen
-                name="my-tournaments"
+                name="(tournaments)"
+                // component={TournamentList}                
                 options={{
                     title: 'Tournaments',
-                    tabBarIcon: ({ focused, color }) => <IconSymbol size={28} name={focused ? 'trophy.fill' : 'trophy'} color={color} />,
+                    tabBarIcon: ({ focused, color }) =>
+                        <IconSymbol size={28} name={focused ? 'trophy.fill' : 'trophy'} color={color} />,
                 }}
             />
             <Tabs.Screen
-                name="profile"
+                name="(profile)"
+                // component={ProfileTopTabs}
                 options={{
                     title: 'Profile',
-                    tabBarIcon: ({ focused, color }) => <IconSymbol size={28} name={focused ? 'person.fill' : 'person'} color={color} />,
+                    headerShown: true,
+                    tabBarIcon: ({ focused, color }) =>
+                        <IconSymbol size={28} name={focused ? 'person.fill' : 'person'} color={color} />,
                 }}
             />
         </Tabs>

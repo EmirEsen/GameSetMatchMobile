@@ -1,20 +1,20 @@
 // components/MyTournaments.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Alert, ImageBackground } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, ImageBackground, SafeAreaView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/index'
-import { getPlayerProfileList, fetchPlayerProfile } from '../../store/feature/playerSlice';
-import { getMatchList } from '../../store/feature/matchSlice';
-import { getMyTournaments } from '../../store/feature/tournamentSlice';
-import { fetchSendConfirmationEmail } from '../../store/feature/authSlice';
-import Tournament from '../../components/Tournament';
+import { AppDispatch, RootState } from '../../../store/index'
+import { getPlayerProfileList, fetchPlayerProfile } from '../../../store/feature/playerSlice';
+import { getMatchList } from '../../../store/feature/matchSlice';
+import { getMyTournaments } from '../../../store/feature/tournamentSlice';
+import { fetchSendConfirmationEmail, logout } from '../../../store/feature/authSlice';
 import { MaterialIcons } from '@expo/vector-icons';
-import { IPlayerProfile } from '../../models/IPlayerProfile';
+import { IPlayerProfile } from '../../../models/IPlayerProfile';
 import config from '@/store/feature/config';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import image from '../../assets/images/claycourt.jpg';
+import image from '../../../assets/images/claycourt.jpg';
+import TournamentCard from '../../../components/TournamentCard';
+import { Link, router } from 'expo-router';
 
-const MyTournaments = () => {
+const TournamentList = () => {
   const { myTournaments, isLoading: isTournamentLoading } = useSelector((state: RootState) => state.tournament);
   const { loggedInProfile } = useSelector((state: RootState) => state.player);
   const isAuth = useSelector((state: RootState) => state.auth.isAuth);
@@ -24,11 +24,14 @@ const MyTournaments = () => {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
-    dispatch(getPlayerProfileList());
-    dispatch(getMatchList());
-    dispatch(getMyTournaments());
+    console.log('isAuth', isAuth);
     if (isAuth) {
+      dispatch(getPlayerProfileList());
+      dispatch(getMatchList());
+      dispatch(getMyTournaments());
       dispatch(fetchPlayerProfile());
+    } else {
+      dispatch(logout());
     }
   }, [isAuth]);
 
@@ -67,6 +70,13 @@ const MyTournaments = () => {
     return isAuth && isEmailVerified;
   };
 
+  const handleTournamentPress = (tournamentId: string) => {
+    const id = tournamentId;
+    const path = `/(tabs)/(tournaments)/${id}`;
+    console.log(`Navigating to: ${path}`);
+    router.push(path as any);
+  };
+
   const getInfoText = () => {
     if (!isAuth) {
       return 'Sign In To Start New Tournament';
@@ -87,7 +97,7 @@ const MyTournaments = () => {
 
   return (
     <ImageBackground source={image} resizeMode="cover" className="flex-1" >
-      <SafeAreaView className="flex-1">
+      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView className="p-4">
           {isAuth && !isEmailVerified && (
             <View className="p-4 bg-yellow-100 rounded-md mb-4">
@@ -97,7 +107,6 @@ const MyTournaments = () => {
               </TouchableOpacity>
             </View>
           )}
-
           {myTournaments.length === 0 ? (
             <View className="mt-10">
               <Text className="text-gray-500 text-lg">
@@ -106,24 +115,31 @@ const MyTournaments = () => {
               </Text>
             </View>
           ) : (
-            myTournaments.map(tournament => (
-              <Tournament key={tournament.id} tournament={tournament} tournamentPlayers={tournamentPlayers[tournament.id] || []} />
-            ))
+            <View className="my-0">
+              {myTournaments.map(tournament => (
+                <TouchableOpacity key={tournament.id} onPress={() => handleTournamentPress(tournament.id)}>
+                  <TournamentCard tournament={tournament} tournamentPlayers={tournamentPlayers[tournament.id] || []} />
+                </TouchableOpacity>
+              ))}
+            </View>
           )}
+
+          <Link href="/_sitemap">View Sitemap</Link>
         </ScrollView>
-        {/* Floating Add Button for Mobile */}
-        <View className="absolute" style={{ bottom: 100, right: 20 }}>
-          <TouchableOpacity
-            onPress={() => { }}
-            disabled={!isFeaturesAvailable()}
-            className={`w-14 h-14 rounded-full flex items-center justify-center ${isFeaturesAvailable() ? 'bg-blue-500' : 'bg-blue-500 bg-opacity-30'}`}
-          >
-            <MaterialIcons name="add" size={32} color="white" />
-          </TouchableOpacity>
-        </View>
       </SafeAreaView>
+      {/* Floating Add Button for Mobile */}
+      <View className="absolute" style={{ bottom: 20, right: 20 }}>
+        <TouchableOpacity
+          onPress={() => { }}
+          disabled={!isFeaturesAvailable()}
+          className={`w-14 h-14 rounded-full flex items-center justify-center ${isFeaturesAvailable() ? 'bg-blue-500' : 'bg-blue-500 bg-opacity-30'}`}
+        >
+          <MaterialIcons name="add" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
     </ImageBackground>
   );
 };
 
-export default MyTournaments;
+export default TournamentList;

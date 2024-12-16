@@ -1,17 +1,16 @@
 import { useFonts } from 'expo-font';
-import { router, Stack, Tabs } from 'expo-router';
+import { router, Slot, Stack, Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import 'react-native-reanimated';
+
 import "../global.css";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import store from '@/store';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/components/ui/toastConfig';
 import * as SecureStore from 'expo-secure-store';
-import { Image } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -55,7 +54,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (isAppReady && token !== null) {
-      router.replace('/my-tournaments');
+      router.replace('/(tabs)/(tournaments)/tournamentList');
     } else if (isAppReady && token === null) {
       router.replace('/');
     }
@@ -68,12 +67,13 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack>
+        <Stack screenOptions={{
+          headerShown: false,
+        }}>
           <Stack.Screen
             name="index"
             options={{ headerShown: false }}
           />
-          {/* These are your screens defined as per expo-router */}
           <Stack.Screen
             name="(auth)"
             options={{ headerShown: false }}
@@ -82,28 +82,10 @@ export default function RootLayout() {
             name="(tabs)"
             options={{ headerShown: false }}
           />
-          <Stack.Screen
-            name="[tournamentId]"
-            options={{
-              headerTitle: "Tournament",
-              headerLeft: () => (
-                <Image
-                  source={require('../assets/images/sampleimage.jpg')}
-                  style={{ width: 36, height: 36, resizeMode: 'cover', borderRadius: 100 }}
-                />
-              )
-            }}
-          />
-          {/* Fallback Screen */}
-          <Stack.Screen
-            name="+not-found"
-            options={{ headerShown: false, title: 'Not Found' }}
-          />
         </Stack>
-
-        <Toast config={toastConfig} />
-        <StatusBar style="auto" />
       </GestureHandlerRootView>
+      <Toast config={toastConfig} />
+      <StatusBar style="dark" />
     </Provider>
   );
 }

@@ -30,7 +30,8 @@ const SignIn = () => {
       .then(async (res) => {
         const payload = res.payload;
         if (payload && typeof payload === 'object' && 'code' in payload && payload.code === 200) {
-          router.replace("/(tabs)/my-tournaments");
+          console.log('inside fetchLogin', payload);
+          router.replace("/(tabs)/(tournaments)/tournamentList");
         } else if (payload && typeof payload === 'object' && 'code' in payload && payload.code > 1000) {
           Alert.alert('Error', payload.message);
         } else {
