@@ -5,15 +5,6 @@ import { Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import TournamentList from './(tournaments)/tournamentList';
-import HomeTopTabs from './(home)/_layout';
-import BlurTabBarBackground from '@/components/ui/TabBarBackground.ios';
-import ProfileTopTabs from './(profile)/_layout';
-import TournamentLayout from './(tournaments)/[id]/_layout';
-import TournamentTopTabs from './(tournaments)/[id]';
-
-// const Tab = createBottomTabNavigator();
 
 export default function TabsLayout() {
     return (
@@ -24,11 +15,11 @@ export default function TabsLayout() {
                     backgroundColor: TabBarBackground,
                 },
                 tabBarButton: HapticTab,
-                tabBarBackground: BlurTabBarBackground,
+                // tabBarBackground: BlurTabBarBackground,
                 tabBarStyle: Platform.select({
                     ios: {
                         borderTopWidth: 0,
-                        backgroundColor: TabBarBackground,
+                        backgroundColor: '#081223',
                     },
                     default: {
                         backgroundColor: '#081223',
