@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import dayjs from 'dayjs';
 import { IGetTournamentPlayer } from "@/models/get/IGetTournamentPlayer";
 import { ITournament } from "@/models/ITournament";
+import { Entypo, Ionicons } from '@expo/vector-icons';
 
 type RankListProps = {
     players: IGetTournamentPlayer[];
@@ -70,12 +71,17 @@ export default function RankList({ players, tournamentId, tournament }: RankList
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>{tournament.title}</Text>
-                <Text style={styles.date}>
-                    {tournament.isDurationFinite
-                        ? `${dayjs(tournament.start).format('DD MMM YY')} - ${dayjs(tournament.end).format('DD MMM YY')}`
-                        : tournament.status}
-                </Text>
+                <View style={styles.headerContent}>
+                    <Text style={styles.title}>{tournament.title}</Text>
+                    <Text style={styles.date}>
+                        {tournament.isDurationFinite
+                            ? `${dayjs(tournament.start).format('DD MMM YY')} - ${dayjs(tournament.end).format('DD MMM YY')} `
+                            : <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Entypo name="infinity" size={16} color="white" />
+                            </View>}
+                        <Ionicons name="timer-outline" size={18} color="white" />
+                    </Text>
+                </View>
             </View>
             <FlatList
                 data={players}
@@ -99,6 +105,11 @@ const styles = StyleSheet.create({
         padding: 5,
         alignItems: 'center',
     },
+    headerContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
@@ -107,6 +118,8 @@ const styles = StyleSheet.create({
     date: {
         fontSize: 14,
         color: '#ddd',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     headerRow: {
         backgroundColor: '#e0e0e0',
