@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -20,6 +20,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import DatePicker from './ui/DatePicker';
 import dayjs from 'dayjs';
 import MergedScorePicker from './ui/ScorePicker';
+import { Picker } from '@react-native-picker/picker';
+import PlayerPicker from './ui/TournamentPlayerPicker';
 
 interface AddNewMatchProps {
     visible: boolean;
@@ -51,9 +53,21 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
     const loggedInProfile = useAppSelector((state) => state.player.loggedInProfile);
     const [editingSet, setEditingSet] = useState<number | null>(null);
 
+    const [formState, setFormState] = useState<IPostMatch>({
+        ...initialFormState,
+        tournamentId: tournamentId,
+        player1Id: loggedInProfile?.id || '',
+    });
 
-    const [formState, setFormState] = useState<IPostMatch>(initialFormState);
-
+    useEffect(() => {
+        if (visible) {
+            setFormState({
+                ...initialFormState,
+                player1Id: loggedInProfile?.id || '',
+                tournamentId: tournamentId,
+            });
+        }
+    }, [visible, loggedInProfile, tournamentId]);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -87,6 +101,8 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
         const newScores = [...formState.score];
         newScores[index] = {
             ...newScores[index],
+            player1Id: formState.player1Id,
+            player2Id: formState.player2Id,
             player1Score,
             player2Score,
         };
@@ -122,7 +138,7 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
 
     const handleSubmit = async () => {
         if (!validateForm()) return;
-
+        console.log(formState);
         try {
             const response = await dispatch(addNewMatch(formState)).unwrap();
             if (response) {
@@ -181,6 +197,14 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
                                     mode="time"
                                 />
                             </View>
+
+                            <PlayerPicker
+                                selectedPlayer={formState.player2Id}
+                                players={tournamentPlayerList}
+                                onChange={(value) => handleChange('player2Id', value)}
+                                error={errors.player2Id}
+                            />
+
 
                             <View style={styles.scoreDisplayContainer}>
                                 {formState.score.map((set, index) => (
@@ -335,6 +359,31 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#4caf50',
     },
+
+    playerPickerContainer: {
+        marginVertical: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderWidth: 1,
+        borderColor: 'blue',
+        borderRadius: 8,
+        backgroundColor: '#1a1a2e',
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
+        marginBottom: 5,
+    },
+    picker: {
+        height: 50,
+        color: 'white',
+        justifyContent: 'center',
+    },
+    pickerItem: {
+        textAlign: 'center',
+    },
+
 
 
 });

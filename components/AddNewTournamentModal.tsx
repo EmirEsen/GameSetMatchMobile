@@ -153,20 +153,16 @@ const AddTournamentModal: React.FC<AddTournamentModalProps> = ({ visible, onClos
                                 handleSwitchChange={(value: boolean) => handleChange('isDurationFinite', value)}
                             />
 
-
-                            {/* MultipleSelectCheckmarks Integration */}
                             <MultipleSelectCheckmarks
                                 selectedItems={formState.participantIds}
                                 onChange={handleParticipantChange}
                                 loggedInUserId={loggedInUserId ?? ''}
                             />
 
-
                             <TournamentPrivacyRadioButton
                                 value={formState.privacy}
                                 onChange={(value: TournamentPrivacy) => handleChange('privacy', value)}
                             />
-
 
                             {/* Submit Button */}
                             <TouchableOpacity
