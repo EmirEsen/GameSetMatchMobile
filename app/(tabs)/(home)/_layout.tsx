@@ -1,28 +1,39 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { withLayoutContext } from 'expo-router';
-import { ParamListBase, TabNavigationState } from '@react-navigation/native';
-import { MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions } from '@react-navigation/material-top-tabs';
 import TabOne from './TabOne';
 import TabTwo from './TabTwo';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Platform } from 'react-native';
-import { HapticTab } from '@/components/HapticTab';
-import BlurTabBarBackground from '@/components/ui/TabBarBackground.ios';
+import { Text } from 'react-native';
 
 const TopTabs = createMaterialTopTabNavigator();
 
+const tabBarIndicatorStyle = {
+    backgroundColor: 'blue',
+    height: 4,
+    borderRadius: 20,
+    marginVertical: 0.1,
+};
+
 const HomeTopTabs = () => {
     return (
-        <TopTabs.Navigator screenOptions={{
-            tabBarStyle: Platform.select({
-                ios: {
-                    // Use a transparent background on iOS to show the blur effect                    
+        <TopTabs.Navigator
+            screenOptions={({ route }) => ({
+                tabBarStyle: {
+                    backgroundColor: '#081223',
                     borderTopWidth: 0,
-                    backgroundColor: TabBarBackground
+                    height: 40,
                 },
-                default: {},
-            }),
-        }}>
+                tabBarIndicatorStyle: tabBarIndicatorStyle,
+                tabBarLabel: ({ focused }) => (
+                    <Text
+                        style={{
+                            color: focused ? 'blue' : 'white',
+                            fontWeight: 'bold',
+                            fontSize: 14,
+                        }}
+                    >
+                        {route.name}
+                    </Text>
+                ),
+            })}>
             <TopTabs.Screen name="TabOne" component={TabOne} />
             <TopTabs.Screen name="TabTwo" component={TabTwo} />
         </TopTabs.Navigator>

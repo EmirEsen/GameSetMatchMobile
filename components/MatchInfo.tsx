@@ -102,7 +102,7 @@ export default function MatchInfo({
                     {`${player1.firstname[0]}. ${player1.lastname}`}
                     {!isDraw && winner === player1 && <Entypo name="check" size={18} color="green" />}
                 </Text>
-                <Text style={styles.score}>{score.map((set) => set.player1Score).join(' ') || 'N/A'}</Text>
+                <Text style={styles.score}>{score.map((set) => set.player1Score).join('  ') || 'N/A'}</Text>
             </View>
 
             <View style={styles.playerRow}>
@@ -111,23 +111,41 @@ export default function MatchInfo({
                     {`${player2.firstname[0]}. ${player2.lastname}`}
                     {!isDraw && winner === player2 && <Entypo name="check" size={18} color="green" />}
                 </Text>
-                <Text style={styles.score}>{score.map((set) => set.player2Score).join(' ') || 'N/A'}</Text>
+                <Text style={styles.score}>{score.map((set) => set.player2Score).join('  ') || 'N/A'}</Text>
             </View>
 
             {status === MatchStatus.PENDING && (
-                <Text style={styles.pendingText}>
-                    Match under review by {player2.firstname}{' '}
-                    <MaterialIcons name="access-time" size={14} color="#ffa726" /> {timeRemaining}
-                </Text>
+                <View style={styles.pendingContainer}>
+                    <Text style={styles.pendingText}>
+                        Match under review by {player2.firstname}
+                    </Text>
+                    <View style={styles.timeContainer}>
+                        <MaterialIcons name="access-time" size={14} color="#ffa726" />
+                        <Text style={styles.pendingText}>{timeRemaining}</Text>
+                    </View>
+                </View>
             )}
 
             <View style={styles.divider} />
 
             <Text style={styles.result}>
-                {isDraw
-                    ? 'The match ended in a draw.'
-                    : `Game, Set, and Match ${winner?.firstname} ${winner?.lastname}.`}
+                {isDraw ? 'The match ended in a draw.' : `Game, Set and Match ${winner?.firstname} ${winner?.lastname}.`}
             </Text>
+            {!isDraw && (
+                <Text style={styles.result}>
+                    {`${winner?.firstname[0]}. ${winner?.lastname} wins `}
+                    {score.map((set, index) => {
+                        const winnerScore = winnerId === player1Id ? set.player1Score : set.player2Score;
+                        const loserScore = winnerId === player1Id ? set.player2Score : set.player1Score;
+                        return (
+                            <Text key={index}>
+                                {winnerScore}-{loserScore}
+                                {index < score.length - 1 ? ' ' : ''}
+                            </Text>
+                        );
+                    })}
+                </Text>
+            )}
 
             {actionButtons && <View style={styles.actionButtons}>{actionButtons}</View>}
         </View>
@@ -145,7 +163,7 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         marginBottom: 8,
     },
@@ -179,6 +197,7 @@ const styles = StyleSheet.create({
     },
     score: {
         fontSize: 14,
+        fontWeight: '400',
         color: '#333',
     },
     ratingChange: {
@@ -195,11 +214,12 @@ const styles = StyleSheet.create({
         color: '#ffa726',
         fontSize: 12,
         marginTop: 8,
+        marginBottom: 8,
     },
     result: {
         fontSize: 12,
         color: 'gray',
-        marginTop: 8,
+        marginTop: 3,
     },
     actionButtons: {
         marginTop: 8,
@@ -212,9 +232,20 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     divider: {
-        height: 0.5,
+        height: 0.4,
         width: 'auto',
         marginHorizontal: 4,
         backgroundColor: 'lightgray',
+    },
+    pendingContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    timeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
     },
 });

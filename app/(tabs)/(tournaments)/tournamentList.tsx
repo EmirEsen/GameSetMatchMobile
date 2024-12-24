@@ -1,9 +1,9 @@
 // components/MyTournaments.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, ImageBackground, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, ImageBackground, SafeAreaView, RefreshControl } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../../store/index'
-import { getPlayerProfileList, fetchPlayerProfile } from '../../../store/feature/playerSlice';
+import { AppDispatch, RootState, useAppSelector } from '../../../store/index'
+import { getPlayerProfileList, fetchLoggedInPlayerProfile } from '../../../store/feature/playerSlice';
 import { getMatchList } from '../../../store/feature/matchSlice';
 import { getMyTournaments } from '../../../store/feature/tournamentSlice';
 import { fetchSendConfirmationEmail, logout } from '../../../store/feature/authSlice';
@@ -13,27 +13,31 @@ import config from '@/store/feature/config';
 import image from '../../../assets/images/claycourt.jpg';
 import TournamentCard from '../../../components/TournamentCard';
 import { Link, router } from 'expo-router';
+import AddNewTournamentModal from '@/components/AddNewTournamentModal';
 
 const TournamentList = () => {
-  const { myTournaments, isLoading: isTournamentLoading } = useSelector((state: RootState) => state.tournament);
-  const { loggedInProfile } = useSelector((state: RootState) => state.player);
-  const isAuth = useSelector((state: RootState) => state.auth.isAuth);
+  const { myTournaments, isLoading: isTournamentLoading } = useAppSelector(state => state.tournament);
+  const { loggedInProfile } = useAppSelector(state => state.player);
+  const isAuth = useAppSelector(state => state.auth.isAuth);
   const dispatch = useDispatch<AppDispatch>();
 
   const [tournamentPlayers, setTournamentPlayers] = useState<{ [key: string]: IPlayerProfile[] }>({});
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     console.log('isAuth', isAuth);
+    console.log('isEmailverified', isEmailVerified)
     if (isAuth) {
       dispatch(getPlayerProfileList());
       dispatch(getMatchList());
       dispatch(getMyTournaments());
-      dispatch(fetchPlayerProfile());
+      dispatch(fetchLoggedInPlayerProfile());
     } else {
       dispatch(logout());
     }
-  }, [isAuth]);
+  }, [isAuth, dispatch]);
 
   useEffect(() => {
     if (loggedInProfile) {
@@ -70,6 +74,11 @@ const TournamentList = () => {
     return isAuth && isEmailVerified;
   };
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+    refreshTournamentList();
+  };
+
   const handleTournamentPress = (tournamentId: string) => {
     const id = tournamentId;
     const path = `/(tabs)/(tournaments)/${id}`;
@@ -77,28 +86,25 @@ const TournamentList = () => {
     router.push(path as any);
   };
 
-  const getInfoText = () => {
-    if (!isAuth) {
-      return 'Sign In To Start New Tournament';
-    }
-    if (isAuth && !isEmailVerified) {
-      return 'Verify Email To Start New Tournament';
-    }
-    return 'Add New Tournament';
+  const refreshTournamentList = async () => {
+    await dispatch(getMyTournaments());
   };
 
-  const refreshTournamentList = () => {
-    dispatch(getMyTournaments());
+  const onRefresh = () => {
+    setRefreshing(true);
+    refreshTournamentList(); // Refresh the tournament list
+    setRefreshing(false);
   };
-
-  if (isTournamentLoading) {
-    return <ActivityIndicator size="large" className="mt-20" />;
-  }
 
   return (
     <ImageBackground source={image} resizeMode="cover" className="flex-1" >
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView className="p-4">
+        <ScrollView
+          className="p-4"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           {isAuth && !isEmailVerified && (
             <View className="p-4 bg-yellow-100 rounded-md mb-4">
               <Text className="text-yellow-800">Your email is not verified. Please verify to use all features.</Text>
@@ -109,13 +115,13 @@ const TournamentList = () => {
           )}
           {myTournaments.length === 0 ? (
             <View className="mt-10">
-              <Text className="text-gray-500 text-lg">
+              <Text className="text-zinc-300 text-lg">
                 You currently have no tournaments.
                 <Text className="font-bold"> You can start a new tournament or join one!</Text>
               </Text>
             </View>
           ) : (
-            <View className="my-0">
+            <View className="my-0 pb-20">
               {myTournaments.map(tournament => (
                 <TouchableOpacity key={tournament.id} onPress={() => handleTournamentPress(tournament.id)}>
                   <TournamentCard tournament={tournament} tournamentPlayers={tournamentPlayers[tournament.id] || []} />
@@ -128,15 +134,29 @@ const TournamentList = () => {
         </ScrollView>
       </SafeAreaView>
       {/* Floating Add Button for Mobile */}
-      <View className="absolute" style={{ bottom: 20, right: 20 }}>
+      <View className="absolute" style={{ bottom: 100, right: 20 }}>
         <TouchableOpacity
-          onPress={() => { }}
+          onPress={toggleModal}
           disabled={!isFeaturesAvailable()}
           className={`w-14 h-14 rounded-full flex items-center justify-center ${isFeaturesAvailable() ? 'bg-blue-500' : 'bg-blue-500 bg-opacity-30'}`}
         >
-          <MaterialIcons name="add" size={32} color="white" />
+          <MaterialIcons name="add" size={32} color="black" />
         </TouchableOpacity>
       </View>
+
+      {/* Add New Tournament Modal */}
+      <AddNewTournamentModal
+        visible={isModalVisible}
+        onClose={toggleModal}
+        onSubmit={async (formData) => {
+          console.log('New Tournament Data:', formData);
+          // Perform any actions to save the new tournament (e.g., dispatch an action)
+          await dispatch(getMyTournaments());
+
+          // Close the modal and refresh the tournament list
+          toggleModal();
+        }}
+      />
 
     </ImageBackground>
   );

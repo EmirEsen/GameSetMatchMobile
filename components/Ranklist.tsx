@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import { FlatList, TouchableOpacity, View, Text, Image, StyleSheet, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import dayjs from 'dayjs';
 import { IGetTournamentPlayer } from "@/models/get/IGetTournamentPlayer";
@@ -10,13 +10,15 @@ type RankListProps = {
     players: IGetTournamentPlayer[];
     tournamentId: string;
     tournament: ITournament;
+    refreshing: boolean;
+    onRefresh: () => void;
 };
 
-function calculateAge(dob: string): number {
-    const birthDate = dayjs(dob);
-    const currentDate = dayjs();
-    return currentDate.diff(birthDate, 'year');
-}
+// function calculateAge(dob: string): number {
+//     const birthDate = dayjs(dob);
+//     const currentDate = dayjs();
+//     return currentDate.diff(birthDate, 'year');
+// }
 
 function calculateWinLossRatio(wins: number, losses: number): string {
     if (!wins && !losses) return '-';
@@ -25,7 +27,7 @@ function calculateWinLossRatio(wins: number, losses: number): string {
     return `${ratio.toFixed(0)}%`;
 }
 
-export default function RankList({ players, tournamentId, tournament }: RankListProps) {
+export default function RankList({ players, tournamentId, tournament, refreshing, onRefresh }: RankListProps) {
     // Renders the header row for the FlatList
     const renderHeader = () => (
         <View style={[styles.row, styles.headerRow]}>
@@ -72,14 +74,18 @@ export default function RankList({ players, tournamentId, tournament }: RankList
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerContent}>
-                    <Text style={styles.title}>{tournament.title}</Text>
+                    <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+                        {tournament.title}
+                    </Text>
                     <Text style={styles.date}>
                         {tournament.isDurationFinite
                             ? `${dayjs(tournament.start).format('DD MMM YY')} - ${dayjs(tournament.end).format('DD MMM YY')} `
                             : <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Entypo name="infinity" size={16} color="white" />
                             </View>}
-                        <Ionicons name="timer-outline" size={18} color="white" />
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Ionicons name="timer-outline" size={18} color="white" style={{ marginLeft: 5, marginTop: 1 }} />
+                        </View>
                     </Text>
                 </View>
             </View>
@@ -90,6 +96,9 @@ export default function RankList({ players, tournamentId, tournament }: RankList
                 ListHeaderComponent={renderHeader} // Add a static header row
                 ListEmptyComponent={<Text style={styles.empty}>No players available</Text>}
                 stickyHeaderIndices={[0]} // Makes the header sticky
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="blue" />
+                }
             />
         </View>
     );
@@ -101,7 +110,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
     },
     header: {
-        backgroundColor: '#081223',
+        backgroundColor: 'blue',
         padding: 5,
         alignItems: 'center',
     },
@@ -109,11 +118,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
+        alignItems: 'center',
     },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#fff',
+        maxWidth: 170,
     },
     date: {
         fontSize: 14,

@@ -12,14 +12,18 @@ export default function TabsLayout() {
             screenOptions={{
                 headerShown: false,
                 headerStyle: {
-                    backgroundColor: TabBarBackground,
+                    backgroundColor: '#081223',
                 },
+                headerTintColor: 'white',
                 tabBarButton: HapticTab,
                 // tabBarBackground: BlurTabBarBackground,
                 tabBarStyle: Platform.select({
                     ios: {
                         borderTopWidth: 0,
                         backgroundColor: '#081223',
+                        position: 'absolute',
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
                     },
                     default: {
                         backgroundColor: '#081223',
@@ -37,7 +41,6 @@ export default function TabsLayout() {
             />
             <Tabs.Screen
                 name="(tournaments)"
-                // component={TournamentList}                
                 options={{
                     title: 'Tournaments',
                     tabBarIcon: ({ focused, color }) =>
@@ -46,7 +49,6 @@ export default function TabsLayout() {
             />
             <Tabs.Screen
                 name="(profile)"
-                // component={ProfileTopTabs}
                 options={{
                     title: 'Profile',
                     headerShown: true,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { IGetMatch } from '../../models/get/IGetMatch';
 import { IGetTournamentPlayer } from '../../models/get/IGetTournamentPlayer';
 import { MatchStatus } from '../../models/enums/MatchStatus';

@@ -12,7 +12,7 @@ export default function Tournament() {
                 color: 'white',
             },
             headerLeft: () => (
-                <TouchableOpacity onPress={() => router.back()}>
+                <TouchableOpacity onPress={() => router.dismissTo('/(tabs)/(tournaments)/tournamentList')}>
                     <IconSymbol name="chevron.left" size={20} color="white" />
                 </TouchableOpacity>
             ),

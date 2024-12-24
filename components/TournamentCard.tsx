@@ -32,7 +32,6 @@ interface TournamentProps {
 }
 
 const TournamentCard: React.FC<TournamentProps> = ({ tournament, tournamentPlayers }) => {
-    const navigation = useNavigation();
     const formattedDates = formatTournamentDate(tournament.start, tournament.end, tournament.isDurationFinite);
 
     return (
@@ -64,7 +63,7 @@ const TournamentCard: React.FC<TournamentProps> = ({ tournament, tournamentPlaye
 
             <View className="flex-row justify-between items-center mt-4">
                 <View className="mx-5">
-                    <AvatarGroup avatars={['pp', 'pp', 'pp']} max={4} />
+                    <AvatarGroup avatars={tournamentPlayers.map(player => ({ avatarUrl: player.profileImageUrl, initials: player.firstname[0] + player.lastname[0] }))} max={4} />
                 </View>
             </View>
         </View>

@@ -46,7 +46,7 @@ export const addNewTournament = createAsyncThunk<IResponse, IPostTournament, { r
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
+                    'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -126,8 +126,8 @@ const tournamentSlice = createSlice({
             })
             .addCase(addNewTournament.fulfilled, (state, action) => {
                 if (action.payload.code === 200) {
-                    // console.log('tournament slice data: ', action.payload.data)
-                    // console.log('tournament slice: ', action.payload.message)
+                    console.log('tournament slice data: ', action.payload.data)
+                    console.log('tournament slice: ', action.payload.message)
                     state.tournamentList.push(action.payload.data)
                 }
                 state.isLoading = false;

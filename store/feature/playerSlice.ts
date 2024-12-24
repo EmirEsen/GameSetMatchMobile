@@ -28,7 +28,7 @@ export const getPlayerProfileList = createAsyncThunk<IPlayerProfile[], void, { r
     }
 )
 
-export const fetchPlayerProfile = createAsyncThunk<IPlayerProfile, void, { rejectValue: string }>(
+export const fetchLoggedInPlayerProfile = createAsyncThunk<IPlayerProfile, void, { rejectValue: string }>(
     'player/getProfile',
     async (_) => {
         const response = await fetch(`${config.BASE_URL}/api/v1/player/profile`, {
@@ -87,18 +87,18 @@ const playerSlice = createSlice({
         build
             .addCase(getPlayerProfileList.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.playerList = action.payload;                
+                state.playerList = action.payload;
             })
-            .addCase(fetchPlayerProfile.pending, (state) => {
+            .addCase(fetchLoggedInPlayerProfile.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(fetchPlayerProfile.fulfilled, (state, action) => {
+            .addCase(fetchLoggedInPlayerProfile.fulfilled, (state, action) => {
                 state.isLoading = false;
                 console.log('player slice : -------------->', action.payload)
                 state.loggedInProfile = action.payload;
             })
-            .addCase(fetchPlayerProfile.rejected, (state) => {
+            .addCase(fetchLoggedInPlayerProfile.rejected, (state) => {
                 state.isLoading = false;
                 state.error = 'Failed to fetch player profile';
                 console.log('couldnt fetch player profile')
