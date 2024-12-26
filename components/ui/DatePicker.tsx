@@ -57,8 +57,9 @@ const DatePicker: React.FC<DateFieldProps> = ({ label, value, onChange, minimumD
                         <View style={styles.spinnerContainer}>
                             <DateTimePicker
                                 value={tempDate}
-                                minimumDate={minimumDate || new Date()}
                                 mode={mode}
+                                minimumDate={minimumDate}
+                                maximumDate={maximumDate}
                                 display="spinner"
                                 onChange={handleDateChange}
                             />
@@ -76,7 +77,8 @@ const DatePicker: React.FC<DateFieldProps> = ({ label, value, onChange, minimumD
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 16,
+        marginBottom: 6,
+        width: '45%'
     },
     label: {
         marginBottom: 8,
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 1)',
+        backgroundColor: 'rgba(0, 0, 0, 1)'
     },
     modalContent: {
         borderRadius: 8,

@@ -15,8 +15,7 @@ export default function Tournament() {
                 <TouchableOpacity onPress={() => router.dismissTo('/(tabs)/(tournaments)/tournamentList')}>
                     <IconSymbol name="chevron.left" size={20} color="white" />
                 </TouchableOpacity>
-            ),
-
+            )
         }}>
             <Stack.Screen name="tournamentList" options={{ headerShown: false }} />
             <Stack.Screen name="[id]" options={{ title: 'Tournament' }} />

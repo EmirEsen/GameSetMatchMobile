@@ -6,11 +6,11 @@ export interface score {
 }
 
 export interface IPostMatch {
-    tournamentId: string
-    court?: string
+    court: string
     date: string
     time?: string
     player1Id: string
     player2Id: string
     score: score[]
+    tournamentId: string
 }

@@ -32,10 +32,10 @@ const HomeTopTabs = () => {
                     >
                         {route.name}
                     </Text>
-                ),
+                )
             })}>
-            <TopTabs.Screen name="TabOne" component={TabOne} />
-            <TopTabs.Screen name="TabTwo" component={TabTwo} />
+            <TopTabs.Screen name="Clubs" component={TabOne} />
+            <TopTabs.Screen name="Feed" component={TabTwo} />
         </TopTabs.Navigator>
     );
 }

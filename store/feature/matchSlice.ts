@@ -25,14 +25,14 @@ export const getMatchList = createAsyncThunk<IGetMatch[], void, { rejectValue: s
     }
 )
 
-export const getPlayerMatchList = createAsyncThunk<IGetMatch[],{ playerId: string; page: number; size: number }, { rejectValue: string }>(
-        'match/getPlayerMatchs',
-        async ({ playerId, page, size }) => {
-            const result = await fetch(`${config.BASE_URL}/api/v1/match/matches?playerId=${playerId}?page=${page}&size=${size}`)
-                .then(data => data.json())
-            return result;
-        }
-    )
+export const getPlayerMatchList = createAsyncThunk<IGetMatch[], { playerId: string; page: number; size: number }, { rejectValue: string }>(
+    'match/getPlayerMatchs',
+    async ({ playerId, page, size }) => {
+        const result = await fetch(`${config.BASE_URL}/api/v1/match/matches?playerId=${playerId}?page=${page}&size=${size}`)
+            .then(data => data.json())
+        return result;
+    }
+)
 
 export const getMatchListByPlayerAndTournament = createAsyncThunk
     <IPageDto<IGetMatch>,
@@ -91,7 +91,7 @@ export const addNewMatch = createAsyncThunk<IResponse, IPostMatch, { rejectValue
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
+                    'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -112,7 +112,7 @@ export const approveMatch = createAsyncThunk<IResponse, { tournamentId: string, 
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
+                    'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`
                 }
             });
 
@@ -138,7 +138,7 @@ export const rejectMatch = createAsyncThunk<IResponse, { tournamentId: string, m
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SecureStore.getItemAsync('token')}`
+                    'Authorization': `Bearer ${await SecureStore.getItemAsync('token')}`
                 }
             });
 
@@ -163,7 +163,7 @@ export const autoRejectMatch = createAsyncThunk<IResponse, { tournamentId: strin
             const response = await fetch(`${config.BASE_URL}/api/v1/match/auto-reject-match/${tournamentId}/${matchId}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',                    
+                    'Content-Type': 'application/json',
                 }
             });
 
@@ -211,7 +211,7 @@ const matchSlice = createSlice({
             })
             .addCase(addNewMatch.fulfilled, (state, action) => {
                 if (action.payload.code === 200) {
-                    state.matchList.push(action.payload.data)
+                    state.matchList.unshift(action.payload.data)
                 }
                 state.isLoading = false;
             })

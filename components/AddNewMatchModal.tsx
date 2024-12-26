@@ -3,7 +3,6 @@ import {
     View,
     Text,
     TextInput,
-    Button,
     StyleSheet,
     ScrollView,
     Alert,
@@ -20,8 +19,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import DatePicker from './ui/DatePicker';
 import dayjs from 'dayjs';
 import MergedScorePicker from './ui/ScorePicker';
-import { Picker } from '@react-native-picker/picker';
 import PlayerPicker from './ui/TournamentPlayerPicker';
+import { useMatchActions } from './actions/useMatchActions';
 
 interface AddNewMatchProps {
     visible: boolean;
@@ -31,7 +30,6 @@ interface AddNewMatchProps {
 }
 
 const initialFormState: IPostMatch = {
-    tournamentId: '',
     court: '',
     date: dayjs().format('YYYY-MM-DD'),
     time: dayjs().format('HH:mm'),
@@ -45,10 +43,12 @@ const initialFormState: IPostMatch = {
             player2Score: 0,
         },
     ],
+    tournamentId: ''
 };
 
 const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: AddNewMatchProps) => {
     const dispatch = useDispatch<AppDispatch>();
+    const { handleMatchAddedToast } = useMatchActions();
 
     const loggedInProfile = useAppSelector((state) => state.player.loggedInProfile);
     const [editingSet, setEditingSet] = useState<number | null>(null);
@@ -136,13 +136,32 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
         }
     };
 
+    const handlePlayer2Change = (player2Id: string) => {
+        const newScores = formState.score.map(score => ({
+            ...score,
+            player2Id
+        }));
+        setFormState({
+            ...formState,
+            player2Id,
+            score: newScores
+        });
+    };
+
+    const filteredPlayerList = tournamentPlayerList.filter(player => player.playerId !== loggedInProfile?.id);
+
     const handleSubmit = async () => {
         if (!validateForm()) return;
-        console.log(formState);
         try {
             const response = await dispatch(addNewMatch(formState)).unwrap();
             if (response) {
-                Alert.alert('Success', 'Match added successfully!');
+                const loggedInTournamentPlayer = tournamentPlayerList.find(
+                    (player) => player.playerId === loggedInProfile?.id
+                );
+
+                if (loggedInTournamentPlayer) {
+                    handleMatchAddedToast(loggedInTournamentPlayer); // Trigger the toast for the logged-in player
+                }
                 setFormState(initialFormState);
                 onClose();
             }
@@ -180,9 +199,9 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
                             <View style={{
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
-                                maxWidth: '80%',
                                 marginHorizontal: 8,
-                                marginTop: 10,
+                                marginTop: 8,
+                                marginBottom: 8
                             }}>
                                 <DatePicker
                                     label="Date"
@@ -200,8 +219,8 @@ const AddNewMatch = ({ visible, onClose, tournamentId, tournamentPlayerList }: A
 
                             <PlayerPicker
                                 selectedPlayer={formState.player2Id}
-                                players={tournamentPlayerList}
-                                onChange={(value) => handleChange('player2Id', value)}
+                                tournamentPlayerList={filteredPlayerList}
+                                onChange={handlePlayer2Change}
                                 error={errors.player2Id}
                             />
 
@@ -335,6 +354,7 @@ const styles = StyleSheet.create({
         color: 'blue',
         marginBottom: 4,
         textAlign: 'center',
+        marginTop: -2
     },
     scoreFieldContainer: {
         flexDirection: 'row',

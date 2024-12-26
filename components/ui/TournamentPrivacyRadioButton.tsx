@@ -43,34 +43,38 @@ export default function TournamentPrivacyRadioButton({ value, onChange }: { valu
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row', // Align buttons in a row
+        flexDirection: 'row',
         justifyContent: 'space-evenly',
-        marginBottom: 10
+        marginBottom: 8,
+        backgroundColor: '#1a1a2e',
+        borderRadius: 10,
+        padding: 8
     },
     radioContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 10,
-        marginVertical: 5
+        marginHorizontal: 8,
+        marginVertical: 8
     },
     circle: {
         height: 18,
         width: 18,
         borderRadius: 9,
         borderWidth: 1,
-        borderColor: '#007AFF',
+        borderColor: 'blue',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFF', // White background for the gap
+        backgroundColor: '#FFF',
     },
     innerCircle: {
         height: 12,
         width: 12,
         borderRadius: 6,
-        backgroundColor: '#007AFF', // Selected color
+        backgroundColor: 'blue',
     },
     label: {
         marginLeft: 5,
         fontSize: 14,
+        color: 'gray',
     },
 });

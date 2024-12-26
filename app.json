@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GameSetMatchMobile",
-    "slug": "GameSetMatchMobile",
+    "name": "GameSetMatch",
+    "slug": "GameSetMatch",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,13 +10,15 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.GameSetMatchMobile"
+      "bundleIdentifier": "com.anonymous.GameSetMatchMobile",
+      "deploymentTarget": "13.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.GameSetMatchMobile"
     },
     "web": {
       "bundler": "metro",
@@ -34,10 +36,24 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3f9a7c5b-4a16-4d33-b3c4-47edeabbe5eb"
+      }
     }
   }
 }

@@ -1,24 +1,25 @@
 // components/MyTournaments.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, ImageBackground, SafeAreaView, RefreshControl } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState, useAppSelector } from '../../../store/index'
+import { View, Text, ScrollView, TouchableOpacity, ImageBackground, SafeAreaView, RefreshControl } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { AppDispatch, useAppSelector } from '../../../store/index'
 import { getPlayerProfileList, fetchLoggedInPlayerProfile } from '../../../store/feature/playerSlice';
 import { getMatchList } from '../../../store/feature/matchSlice';
 import { getMyTournaments } from '../../../store/feature/tournamentSlice';
-import { fetchSendConfirmationEmail, logout } from '../../../store/feature/authSlice';
+import { fetchSendConfirmationEmail } from '../../../store/feature/authSlice';
 import { MaterialIcons } from '@expo/vector-icons';
 import { IPlayerProfile } from '../../../models/IPlayerProfile';
 import config from '@/store/feature/config';
 import image from '../../../assets/images/claycourt.jpg';
 import TournamentCard from '../../../components/TournamentCard';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import AddNewTournamentModal from '@/components/AddNewTournamentModal';
+import { Swipeable, RectButton } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const TournamentList = () => {
   const { myTournaments, isLoading: isTournamentLoading } = useAppSelector(state => state.tournament);
   const { loggedInProfile } = useAppSelector(state => state.player);
-  const isAuth = useAppSelector(state => state.auth.isAuth);
   const dispatch = useDispatch<AppDispatch>();
 
   const [tournamentPlayers, setTournamentPlayers] = useState<{ [key: string]: IPlayerProfile[] }>({});
@@ -27,20 +28,14 @@ const TournamentList = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    console.log('isAuth', isAuth);
-    console.log('isEmailverified', isEmailVerified)
-    if (isAuth) {
-      dispatch(getPlayerProfileList());
-      dispatch(getMatchList());
-      dispatch(getMyTournaments());
-      dispatch(fetchLoggedInPlayerProfile());
-    } else {
-      dispatch(logout());
-    }
-  }, [isAuth, dispatch]);
+    dispatch(getPlayerProfileList());
+    dispatch(getMatchList());
+    dispatch(getMyTournaments());
+    dispatch(fetchLoggedInPlayerProfile());
+  }, [dispatch]);
 
   useEffect(() => {
-    if (loggedInProfile) {
+    if (loggedInProfile?.isEmailVerified) {
       setIsEmailVerified(loggedInProfile.isEmailVerified);
     }
   }, [loggedInProfile]);
@@ -71,7 +66,7 @@ const TournamentList = () => {
   };
 
   const isFeaturesAvailable = () => {
-    return isAuth && isEmailVerified;
+    return isEmailVerified;
   };
 
   const toggleModal = () => {
@@ -105,7 +100,7 @@ const TournamentList = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {isAuth && !isEmailVerified && (
+          {!isEmailVerified && (
             <View className="p-4 bg-yellow-100 rounded-md mb-4">
               <Text className="text-yellow-800">Your email is not verified. Please verify to use all features.</Text>
               <TouchableOpacity onPress={reSendConfirmationEmail} className="mt-2">
@@ -130,15 +125,15 @@ const TournamentList = () => {
             </View>
           )}
 
-          <Link href="/_sitemap">View Sitemap</Link>
         </ScrollView>
       </SafeAreaView>
-      {/* Floating Add Button for Mobile */}
+
       <View className="absolute" style={{ bottom: 100, right: 20 }}>
         <TouchableOpacity
           onPress={toggleModal}
           disabled={!isFeaturesAvailable()}
-          className={`w-14 h-14 rounded-full flex items-center justify-center ${isFeaturesAvailable() ? 'bg-blue-500' : 'bg-blue-500 bg-opacity-30'}`}
+          className={`w-14 h-14 rounded-full flex items-center justify-center ${isFeaturesAvailable() ? 'bg-blue-500' : 'bg-zinc-400'}`}
+          style={{ opacity: isFeaturesAvailable() ? 1 : 0.6 }}
         >
           <MaterialIcons name="add" size={32} color="black" />
         </TouchableOpacity>
@@ -152,12 +147,10 @@ const TournamentList = () => {
           console.log('New Tournament Data:', formData);
           // Perform any actions to save the new tournament (e.g., dispatch an action)
           await dispatch(getMyTournaments());
-
           // Close the modal and refresh the tournament list
           toggleModal();
         }}
       />
-
     </ImageBackground>
   );
 };

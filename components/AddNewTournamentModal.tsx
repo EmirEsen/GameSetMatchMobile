@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
-import dayjs, { Dayjs } from 'dayjs';
-
-import { TournamentPrivacy } from '../models/enums/TournamentPrivacy';
+import React, { useState } from 'react';
+import {
+    Modal,
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    TouchableWithoutFeedback,
+    Keyboard,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import TournamentDurationSwitch from './ui/TournamentDurationSwitch';
+import dayjs from 'dayjs';
 import DatePicker from './ui/DatePicker';
+import TournamentDurationSwitch from './ui/TournamentDurationSwitch';
 import MultipleSelectCheckmarks from './ui/MultipleSelectCheckmarks';
-import { AppDispatch, useAppSelector } from '@/store';
 import TournamentPrivacyRadioButton from './ui/TournamentPrivacyRadioButton';
-import { IPostTournament } from '@/models/post/IPostTournament';
+import { TournamentPrivacy } from '../models/enums/TournamentPrivacy';
+import { AppDispatch, useAppSelector } from '@/store';
+import { getMyTournaments } from '@/store/feature/tournamentSlice';
+import { addNewTournament } from '@/store/feature/tournamentSlice';
 import { useDispatch } from 'react-redux';
-import { addNewTournament, getMyTournaments } from '@/store/feature/tournamentSlice';
-
-
+import { IPostTournament } from '@/models/post/IPostTournament';
 
 interface AddTournamentModalProps {
     visible: boolean;
@@ -21,25 +28,23 @@ interface AddTournamentModalProps {
     onSubmit: (formData: any) => void;
 }
 
+const initialFormState: IPostTournament = {
+    title: '',
+    info: '',
+    privacy: TournamentPrivacy.PUBLIC,
+    isDurationFinite: false,
+    startDate: null,
+    endDate: null,
+    participantIds: [],
+    createdById: '',
+    updatedAt: dayjs().toISOString(),
+};
 
 const AddTournamentModal: React.FC<AddTournamentModalProps> = ({ visible, onClose, onSubmit }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const loggedInUserId = useAppSelector((state) => state.player.loggedInProfile?.id);
-
-    const initialFormState: IPostTournament = {
-        title: '',
-        info: '',
-        privacy: TournamentPrivacy.PUBLIC,
-        isDurationFinite: false,
-        startDate: null,
-        endDate: null,
-        participantIds: [],
-        createdById: loggedInUserId ?? '',
-        updatedAt: dayjs().toISOString(),
-    };
+    const loggedInProfile = useAppSelector((state) => state.player.loggedInProfile);
 
     const [formState, setFormState] = useState<IPostTournament>(initialFormState);
-
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const validateForm = () => {
@@ -51,20 +56,13 @@ const AddTournamentModal: React.FC<AddTournamentModalProps> = ({ visible, onClos
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    const handleChange = (name: keyof typeof formState, value: typeof formState[keyof typeof formState]) => {
-        setFormState((prevState) => {
-            const updatedState = { ...prevState, [name]: value };
 
-            if (name === 'startDate' && dayjs(value as string).isAfter(dayjs(prevState.endDate))) {
-                updatedState.endDate = value as string;
-            }
-
-            return updatedState;
-        });
-    };
-
-    const handleParticipantChange = (selectedParticipants: string[]) => {
-        handleChange('participantIds', selectedParticipants);
+    const handleChange = (name: keyof typeof formState, value: any) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            createdById: loggedInProfile?.id ?? '',
+            [name]: value,
+        }));
     };
 
     const handleSubmit = async () => {
@@ -72,81 +70,64 @@ const AddTournamentModal: React.FC<AddTournamentModalProps> = ({ visible, onClos
         await dispatch(addNewTournament(formState));
         await dispatch(getMyTournaments());
         onSubmit(formState);
-        handleClose();
+        setFormState(initialFormState);
+        onClose();
     };
 
     const handleClose = () => {
-        setFormState(initialFormState); // Reset form state
-        onClose(); // Call parent onClose
+        setFormState(initialFormState);
+        onClose();
     };
-
 
     return (
         <Modal visible={visible} animationType="none" transparent>
-            <LinearGradient
-                colors={["rgba(0, 0, 0, 0.7)", "rgba(0, 0, 0, 0.7)"]}
-                style={{ flex: 1 }}
-            >
-                <View className="flex-1 justify-center items-center">
-                    <View className="bg-white rounded-xl p-5 w-4/5 relative">
-                        <Text className="text-lg font-bold mb-4 text-center">Add New Tournament</Text>
-                        <View>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <LinearGradient
+                    colors={["rgba(0, 0, 0, 0.5)", "rgba(0, 0, 0, 0.5)"]}
+                    style={styles.modalBackground}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.title}>Add New Tournament</Text>
+
                             {/* Title */}
-                            <Text>Title</Text>
                             <TextInput
+                                style={styles.input}
                                 placeholder="Tournament Title"
+                                placeholderTextColor="blue"
                                 value={formState.title}
                                 onChangeText={(text) => handleChange('title', text)}
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: '#ccc',
-                                    padding: 8,
-                                    marginVertical: 5,
-                                    borderRadius: 5,
-                                }}
                             />
-                            {errors.title && <Text style={{ color: 'red' }}>{errors.title}</Text>}
+                            {errors.title && <Text style={styles.error}>{errors.title}</Text>}
 
                             {/* Info */}
-                            <Text>Info</Text>
                             <TextInput
+                                style={[styles.input, { height: 80 }]}
                                 placeholder="Tournament Info"
+                                placeholderTextColor="blue"
                                 value={formState.info}
                                 onChangeText={(text) => handleChange('info', text)}
                                 multiline
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: '#ccc',
-                                    padding: 8,
-                                    marginVertical: 5,
-                                    borderRadius: 5,
-                                    height: 80,
-                                }}
                             />
 
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={{ flex: 1, marginRight: 10 }}>
-                                    <DatePicker
-                                        label="Start Date"
-                                        value={formState.startDate ?? ''}
-                                        onChange={(date) => handleChange('startDate', date)}
-                                        isDisabled={!formState.isDurationFinite}
-                                        mode="date"
-                                    />
-                                </View>
-                                <View style={{ flex: 1, marginLeft: 10 }}>
-                                    <DatePicker
-                                        label="End Date"
-                                        value={formState.endDate ?? ''}
-                                        defaultValue={formState.startDate ?? ''}
-                                        minimumDate={new Date(formState.startDate ?? '')}
-                                        onChange={(date) => handleChange('endDate', date)}
-                                        isDisabled={!formState.isDurationFinite}
-                                        mode="date"
-                                    />
-                                </View>
+                            {/* Date Pickers */}
+                            <View style={styles.datePickerContainer}>
+                                <DatePicker
+                                    label="Start Date"
+                                    value={formState.startDate ?? ''}
+                                    onChange={(date) => handleChange('startDate', date)}
+                                    isDisabled={!formState.isDurationFinite}
+                                    mode="date"
+                                />
+                                <DatePicker
+                                    label="End Date"
+                                    value={formState.endDate ?? ''}
+                                    onChange={(date) => handleChange('endDate', date)}
+                                    isDisabled={!formState.isDurationFinite}
+                                    mode="date"
+                                />
                             </View>
-
+                            {errors.endDate && <Text style={styles.error}>{errors.endDate}</Text>}
 
                             <TournamentDurationSwitch
                                 isFiniteDuration={formState.isDurationFinite}
@@ -155,8 +136,8 @@ const AddTournamentModal: React.FC<AddTournamentModalProps> = ({ visible, onClos
 
                             <MultipleSelectCheckmarks
                                 selectedItems={formState.participantIds}
-                                onChange={handleParticipantChange}
-                                loggedInUserId={loggedInUserId ?? ''}
+                                onChange={(selected) => handleChange('participantIds', selected)}
+                                loggedInUserId={loggedInProfile?.id ?? ''}
                             />
 
                             <TournamentPrivacyRadioButton
@@ -164,24 +145,82 @@ const AddTournamentModal: React.FC<AddTournamentModalProps> = ({ visible, onClos
                                 onChange={(value: TournamentPrivacy) => handleChange('privacy', value)}
                             />
 
-                            {/* Submit Button */}
-                            <TouchableOpacity
-                                onPress={handleSubmit}
-                                style={{ backgroundColor: '#007BFF', padding: 10, borderRadius: 16, alignItems: 'center' }}
-                            >
-                                <Text style={{ color: 'white', fontWeight: 'bold' }}>Start Tournament</Text>
+                            <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
+                                <Text style={styles.primaryButtonText}>Start Tournament</Text>
                             </TouchableOpacity>
-
-                            {/* Cancel Button */}
-                            <TouchableOpacity onPress={handleClose} style={{ marginTop: 10, borderWidth: 1, borderColor: '#007BFF', padding: 10, borderRadius: 16, alignItems: 'center' }}>
-                                <Text style={{ textAlign: 'center', color: '#007BFF' }}>Cancel</Text>
+                            <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
+                                <Text style={styles.cancelButtonText}>Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
-            </LinearGradient>
+                </LinearGradient>
+            </TouchableWithoutFeedback>
         </Modal>
     );
 };
+
+const styles = StyleSheet.create({
+    modalBackground: {
+        flex: 1,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: '#081223',
+        borderRadius: 12,
+        padding: 20,
+        width: '85%',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: 'blue',
+        marginBottom: 20,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: 'blue',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+        color: 'gray',
+    },
+    datePickerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    error: {
+        color: 'red',
+        marginBottom: 10,
+        marginLeft: 10,
+    },
+    primaryButton: {
+        backgroundColor: 'blue',
+        padding: 10,
+        borderRadius: 16,
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    primaryButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    cancelButton: {
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: 'red',
+        padding: 10,
+        borderRadius: 16,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        color: 'red',
+    },
+});
 
 export default AddTournamentModal;

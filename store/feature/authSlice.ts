@@ -11,7 +11,6 @@ export interface IAuthState {
     isLoading: boolean
     message: string
     token?: string;
-    isAuth?: boolean;
 }
 
 const initialAuthState: IAuthState = {
@@ -19,7 +18,6 @@ const initialAuthState: IAuthState = {
     isLoading: false,
     message: '',
     token: undefined,
-    isAuth: false
 }
 
 
@@ -132,11 +130,9 @@ const authSlice = createSlice({
     initialState: initialAuthState,
     reducers: {
         setToken(state, action: PayloadAction<string>) {
-            state.isAuth = true
             state.token = action.payload;
         },
         logout(state) {
-            state.isAuth = false;
             state.token = ''
             SecureStore.deleteItemAsync('token')
             state.data = '';
@@ -163,7 +159,6 @@ const authSlice = createSlice({
             .addCase(fetchLogin.fulfilled, (state, action) => {
                 state.isLoading = false;
                 if (action.payload.data) {
-                    state.isAuth = true;
                     state.token = action.payload.data;
                     SecureStore.setItemAsync('token', action.payload.data);
                 }

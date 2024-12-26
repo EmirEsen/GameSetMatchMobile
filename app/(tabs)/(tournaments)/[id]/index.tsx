@@ -2,9 +2,7 @@ import { Text } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Matchs from './Matchs';
 import Ranklist from './Ranklist';
-import { ParamListBase } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import AddNewMatchModal from '@/components/AddNewMatchModal';
 
 const TopTabs = createMaterialTopTabNavigator();
 

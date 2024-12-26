@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, ScrollView, Alert, Dimensions, KeyboardAvoidingView, Platform, StatusBar, ImageBackground } from 'react-native'
+import { View, Text, SafeAreaView, ScrollView, Alert, Dimensions, KeyboardAvoidingView, Platform, ImageBackground } from 'react-native'
 import React, { useState } from 'react'
 import FormField from '@/components/FormField';
 import CustomButton from '@/components/CustomButton';

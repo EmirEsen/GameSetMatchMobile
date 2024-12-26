@@ -224,7 +224,8 @@ const styles = StyleSheet.create({
     actionButtons: {
         marginTop: 8,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
+        gap: 80,
     },
     notFound: {
         textAlign: 'center',

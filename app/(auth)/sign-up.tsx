@@ -7,9 +7,9 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { fetchRegister } from '@/store/feature/authSlice';
 import { IRegister } from '@/models/auth/IRegister';
-import Toast from 'react-native-toast-message';
 import image from '../../assets/images/ballcorner.jpg';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Burnt from "burnt";
 
 const SignUp = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,21 +39,24 @@ const SignUp = () => {
       const result = await dispatch(fetchRegister(form)).unwrap();
       console.log(result);
       if (result && result.code === 200) {
-        Toast.show({
-          text1: "Sign-in and verify your Email.",
-          type: "success"
+        Burnt.toast({
+          title: "Sign-in and verify your Email.",
+          message: "Success",
+          preset: "done"
         });
         router.replace("/(auth)/sign-in");
       } else if (result) {
-        Toast.show({
-          text1: result.message,
-          type: "error"
+        Burnt.toast({
+          title: "An error occurred",
+          message: result.message,
+          preset: "error"
         });
       }
     } catch (error) {
-      Toast.show({
-        text1: "An error occurred",
-        type: "error"
+      Burnt.toast({
+        title: "An error occurred",
+        message: "Error",
+        preset: "error"
       });
     } finally {
       setSubmitting(false);

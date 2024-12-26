@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { router, Slot, Stack, Tabs } from 'expo-router';
+import { router, Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -7,15 +7,14 @@ import { useEffect, useState } from 'react';
 import "../global.css";
 import { Provider } from 'react-redux';
 import store from '@/store';
-import Toast from 'react-native-toast-message';
-import { toastConfig } from '@/components/ui/toastConfig';
 import * as SecureStore from 'expo-secure-store';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Toaster } from 'burnt/web';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded, error] = useFonts({
+  const [fontsLoaded] = useFonts({
     "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-ExtraBold": require("../assets/fonts/Poppins-ExtraBold.ttf"),
@@ -33,6 +32,7 @@ export default function RootLayout() {
   const fetchToken = async () => {
     try {
       const savedToken = await SecureStore.getItemAsync('token');
+      console.log('Token fetched from SecureStore:', savedToken); // Debug log
       setToken(savedToken);
     } catch (err) {
       console.error('Error fetching token:', err);
@@ -40,51 +40,48 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
-    fetchToken();
-  }, []);
+    const prepareApp = async () => {
+      try {
+        // Fetch token and wait for fonts to load
+        await fetchToken();
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync().catch(err =>
-        console.error('Error hiding splash screen:', err)
-      );
-      setIsAppReady(true);
-    }
+        // Ensure fonts are loaded before proceeding
+        if (fontsLoaded) {
+          setIsAppReady(true);
+        }
+      } catch (err) {
+        console.error('Error during app initialization:', err);
+      } finally {
+        // Hide splash screen once the app is ready
+        SplashScreen.hideAsync();
+      }
+    };
+
+    prepareApp();
   }, [fontsLoaded]);
 
   useEffect(() => {
-    if (isAppReady && token !== null) {
-      router.replace('/(tabs)/(tournaments)/tournamentList');
-    } else if (isAppReady && token === null) {
-      router.replace('/');
+    if (isAppReady) {
+      if (token) {
+        console.log('Navigating to tournaments page with token:', token);
+        router.replace('/(tabs)/(tournaments)/tournamentList');
+      } else {
+        console.log('No token found, navigating to auth page.');
+        router.replace('/');
+      }
     }
   }, [isAppReady, token]);
 
   if (!isAppReady) {
-    return null; // Prevent rendering until the app is ready
+    return null;
   }
 
   return (
     <Provider store={store}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack screenOptions={{
-          headerShown: false,
-        }}>
-          <Stack.Screen
-            name="index"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="(auth)"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="(tabs)"
-            options={{ headerShown: false }}
-          />
-        </Stack>
+        <Slot />
       </GestureHandlerRootView>
-      <Toast config={toastConfig} />
+      <Toaster position='bottom-right' />
       <StatusBar style="dark" />
     </Provider>
   );

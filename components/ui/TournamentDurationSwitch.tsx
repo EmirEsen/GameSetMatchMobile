@@ -17,7 +17,7 @@ export default function TournamentDurationSwitch({
                 value={isFiniteDuration} // `checked` in MUI is equivalent to `value` in React Native
                 onValueChange={handleSwitchChange} // Triggered with `true` or `false`
                 thumbColor={isFiniteDuration ? '' : '#f4f3f4'} // Green when true, light gray when false
-                trackColor={{ false: '#767577', true: '#007BFF' }} // Dark gray when false, light green when true
+                trackColor={{ false: '#767577', true: 'blue' }} // Dark gray when false, light green when true
                 style={styles.switch} // Custom styling for smaller size
             />
         </View>
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 10,
-        marginBottom: 10,
+        marginBottom: 8
     },
     label: {
         fontSize: 16,

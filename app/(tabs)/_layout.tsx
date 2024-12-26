@@ -1,10 +1,9 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 
 export default function TabsLayout() {
     return (
@@ -16,7 +15,6 @@ export default function TabsLayout() {
                 },
                 headerTintColor: 'white',
                 tabBarButton: HapticTab,
-                // tabBarBackground: BlurTabBarBackground,
                 tabBarStyle: Platform.select({
                     ios: {
                         borderTopWidth: 0,
@@ -37,12 +35,19 @@ export default function TabsLayout() {
                     headerShown: true,
                     tabBarIcon: ({ focused, color }) =>
                         <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />,
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => router.push('/Notifications')}>
+                            <View className="p-4">
+                                <IconSymbol name="bell" size={20} color="white" />
+                            </View>
+                        </TouchableOpacity>
+                    )
                 }}
             />
             <Tabs.Screen
                 name="(tournaments)"
                 options={{
-                    title: 'Tournaments',
+                    title: 'My Tournaments',
                     tabBarIcon: ({ focused, color }) =>
                         <IconSymbol size={28} name={focused ? 'trophy.fill' : 'trophy'} color={color} />,
                 }}

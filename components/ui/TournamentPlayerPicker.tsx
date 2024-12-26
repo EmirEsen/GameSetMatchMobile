@@ -1,18 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { IGetTournamentPlayer } from '@/models/get/IGetTournamentPlayer';
 
 interface PlayerPickerProps {
     selectedPlayer: string;
-    players: Array<{ id: string; firstname: string; lastname: string; rank?: string }>;
+    tournamentPlayerList: IGetTournamentPlayer[];
     onChange: (playerId: string) => void;
     error?: string;
 }
 
-const PlayerPicker: React.FC<PlayerPickerProps> = ({ selectedPlayer, players, onChange, error }) => {
-    const items = players.map((player) => ({
+const PlayerPicker: React.FC<PlayerPickerProps> = ({ selectedPlayer, tournamentPlayerList, onChange, error }) => {
+    const items = tournamentPlayerList.map((player) => ({
         label: `${player.firstname} ${player.lastname}`,
-        value: player.id,
+        value: player.playerId,
     }));
 
     return (
